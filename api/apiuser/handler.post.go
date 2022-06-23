@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	BasePath = "/v1/users"
+	BASE_PATH = "/v1/users"
 )
 
 func PostUserHandler(logger *zerolog.Logger) func(c *gin.Context) {
@@ -35,7 +35,7 @@ func PostUserHandler(logger *zerolog.Logger) func(c *gin.Context) {
 		}
 
 		response := models.UserCreationResponse{
-			Link: BasePath + "/" + userId,
+			Link: BASE_PATH + "/" + userId,
 		}
 
 		c.JSON(http.StatusCreated, response)

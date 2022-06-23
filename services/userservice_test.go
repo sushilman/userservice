@@ -22,3 +22,15 @@ func TestCreateUser(t *testing.T) {
 	require.Nil(t, err)
 	assert.NotNil(t, userId)
 }
+
+func TestGetUser(t *testing.T) {
+	// TODO: mock tests
+}
+
+func TestUpdateUser(t *testing.T) {
+	// TODO:
+}
+
+func TestDeleteUser(t *testing.T) {
+	// TODO:
+}

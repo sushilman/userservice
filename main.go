@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -22,7 +21,6 @@ func main() {
 	fmt.Println("FACEIT User Service")
 
 	logger := zerolog.New(os.Stderr).With().Timestamp().Caller().Str("service", serviceName).Logger()
-	ctx := context.Background()
 
 	router := gin.Default()
 
@@ -32,7 +30,7 @@ func main() {
 		})
 	})
 
-	apiuser.InitRoutes(&ctx, &logger, router)
+	apiuser.InitRoutes(&logger, router)
 
 	router.Run()
 }

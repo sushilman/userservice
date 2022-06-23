@@ -21,3 +21,4 @@ Demo user service
 ## Possible Extension/Improvements
 - If there are 3rd party external services that should be notified, then notifying them via webhook would be sensible. For that, we would also need a subscription management system, where the interested parties/clients can subscribe to the events that we expose. In the subscription, the subscriber should provide their REST API uri (along with credentials) that should be invoked when an event occurs.
 - Make use of a proper logger framework like - zerolog
+- Page numbering system can be improved (using cursor instead of pagesize and number)

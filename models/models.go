@@ -26,3 +26,22 @@ type User struct {
 type UserCreationResponse struct {
 	Link string `json:"link"`
 }
+
+type GetUsersResponse struct {
+	Data  []User          `json:"data"`
+	Links PaginationLinks `json:"links"`
+}
+
+type PaginationLinks struct {
+	Prev string `json:"prev,omitempty"`
+	Self string `json:"self,omitempty"`
+	Next string `json:"next,omitempty"`
+}
+
+type GetUserQueryParams struct {
+	Country   string `form:"country"`
+	FirstName string `form:"last_name"`
+	LastName  string `form:"last_name"`
+	Offset    uint   `form:"offset"`
+	Limit     uint   `form:"limit"`
+}
