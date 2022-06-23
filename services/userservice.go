@@ -67,3 +67,8 @@ func (us *UserService) UpdateUserById(logger *zerolog.Logger, userId string) err
 	// TODO: implement
 	return nil
 }
+
+func (us *UserService) DeleteUserById(logger *zerolog.Logger, userId string) error {
+	// TODO: implement
+	return nil
+}

@@ -10,4 +10,5 @@ func InitRoutes(logger *zerolog.Logger, e *gin.Engine) {
 	e.GET("/v1/users", GetUsersHandler(logger))
 	e.GET("/v1/users/:userId", GetUserByIdHandler(logger))
 	e.PUT("/v1/users/:userId", UpdateUserByIdHandler(logger))
+	e.DELETE("/v1/users/:userId", DeleteUserByIdHandler(logger))
 }
