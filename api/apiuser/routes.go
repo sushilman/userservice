@@ -8,5 +8,5 @@ import (
 )
 
 func InitRoutes(ctx *context.Context, logger *zerolog.Logger, e *gin.Engine) {
-	e.POST("/v1/users", PostUserHandler(ctx, logger))
+	e.POST("/v1/users", PostUserHandler(logger))
 }
