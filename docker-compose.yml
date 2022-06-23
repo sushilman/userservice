@@ -1,0 +1,8 @@
+version: "2.1"
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: userservicedb
+    ports:
+      - 27017:27017
