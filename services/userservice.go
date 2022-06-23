@@ -63,7 +63,7 @@ func (us *UserService) GetUserById(logger *zerolog.Logger, userId string) (model
 	return mockedUser, nil
 }
 
-func (us *UserService) UpdateUserById(logger *zerolog.Logger, userId string) error {
+func (us *UserService) UpdateUserById(logger *zerolog.Logger, userId string, userCreation models.UserCreation) error {
 	// TODO: implement
 	return nil
 }
