@@ -1,9 +1,11 @@
 package apiuser
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/sushilman/userservice/db"
 	"github.com/sushilman/userservice/models"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +18,7 @@ const (
 	BASE_PATH = "/v1/users"
 )
 
-func PostUserHandler(logger *zerolog.Logger) func(c *gin.Context) {
+func PostUserHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var userCreation models.UserCreation
 		errBindJSON := c.BindJSON(&userCreation)
@@ -26,9 +28,9 @@ func PostUserHandler(logger *zerolog.Logger) func(c *gin.Context) {
 			return
 		}
 
-		userservice := services.NewUserService()
+		userService := services.NewUserService(s)
 
-		userId, err := userservice.CreateUser(logger, userCreation)
+		userId, err := userService.CreateUser(ctx, logger, userCreation)
 		if err != nil {
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
 			return

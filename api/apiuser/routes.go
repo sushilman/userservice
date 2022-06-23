@@ -1,14 +1,17 @@
 package apiuser
 
 import (
+	"context"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
+	"github.com/sushilman/userservice/db"
 )
 
-func InitRoutes(logger *zerolog.Logger, e *gin.Engine) {
-	e.POST("/v1/users", PostUserHandler(logger))
-	e.GET("/v1/users", GetUsersHandler(logger))
-	e.GET("/v1/users/:userId", GetUserByIdHandler(logger))
-	e.PUT("/v1/users/:userId", UpdateUserByIdHandler(logger))
-	e.DELETE("/v1/users/:userId", DeleteUserByIdHandler(logger))
+func InitRoutes(ctx context.Context, logger *zerolog.Logger, r *gin.Engine, s db.IStorage) {
+	r.POST("/v1/users", PostUserHandler(ctx, logger, s))
+	r.GET("/v1/users", GetUsersHandler(ctx, logger, s))
+	r.GET("/v1/users/:userId", GetUserByIdHandler(ctx, logger, s))
+	r.PUT("/v1/users/:userId", UpdateUserByIdHandler(ctx, logger, s))
+	r.DELETE("/v1/users/:userId", DeleteUserByIdHandler(ctx, logger, s))
 }

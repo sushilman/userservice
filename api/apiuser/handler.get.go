@@ -1,9 +1,11 @@
 package apiuser
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
+	"github.com/sushilman/userservice/db"
 	"github.com/sushilman/userservice/models"
 
 	"github.com/gin-gonic/gin"
@@ -16,7 +18,7 @@ const (
 	DefaultLimit = 16
 )
 
-func GetUsersHandler(logger *zerolog.Logger) func(c *gin.Context) {
+func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var queryParams models.GetUserQueryParams
 		errBind := c.BindQuery(&queryParams)
@@ -31,9 +33,9 @@ func GetUsersHandler(logger *zerolog.Logger) func(c *gin.Context) {
 			return
 		}
 
-		userservice := services.NewUserService()
+		userService := services.NewUserService(s)
 
-		users, err := userservice.GetUsers(logger, queryParams)
+		users, err := userService.GetUsers(ctx, logger, queryParams)
 		if err != nil {
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
 			return
@@ -70,11 +72,11 @@ func GetUsersHandler(logger *zerolog.Logger) func(c *gin.Context) {
 	}
 }
 
-func GetUserByIdHandler(logger *zerolog.Logger) func(c *gin.Context) {
+func GetUserByIdHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		userservice := services.NewUserService()
+		userservice := services.NewUserService(s)
 
-		user, err := userservice.GetUserById(logger, c.Param("userId"))
+		user, err := userservice.GetUserById(ctx, logger, c.Param("userId"))
 		if err != nil {
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
 			return
@@ -83,4 +85,3 @@ func GetUserByIdHandler(logger *zerolog.Logger) func(c *gin.Context) {
 		c.JSON(http.StatusOK, user)
 	}
 }
-

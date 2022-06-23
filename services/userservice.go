@@ -1,66 +1,55 @@
 package services
 
 import (
+	"context"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
+	"github.com/sushilman/userservice/db"
 	"github.com/sushilman/userservice/models"
 )
 
-type UserService struct{}
-
-func NewUserService() *UserService {
-	return &UserService{}
+type UserService struct {
+	storage db.IStorage
 }
 
-func (us *UserService) CreateUser(logger *zerolog.Logger, userCreation models.UserCreation) (string, error) {
+func NewUserService(storage db.IStorage) *UserService {
+	return &UserService{storage}
+}
+
+func (us *UserService) CreateUser(ctx context.Context, logger *zerolog.Logger, userCreation models.UserCreation) (string, error) {
 	newUserId := uuid.NewString()
+	createdAt := time.Now().UTC().Format(time.RFC3339)
+
+	us.storage.Insert(ctx, models.User{
+		Id:        newUserId,
+		FirstName: userCreation.FirstName,
+		LastName:  userCreation.LastName,
+		Nickname:  userCreation.Nickname,
+		Email:     userCreation.Email,
+		Country:   userCreation.Country,
+		CreatedAt: createdAt,
+		UpdatedAt: createdAt,
+	})
+
 	return newUserId, nil
 }
 
-func (us *UserService) GetUsers(logger *zerolog.Logger, queryParams models.GetUserQueryParams) ([]models.User, error) {
-	// TODO: implement
-	// this is just the mocked mockedUsers
-	mockedUsers := []models.User{
-		{
-			Id:        "c499e35b-2586-45a0-a304-ea602f3e9922",
-			FirstName: "Maximilian",
-			LastName:  "Mustermann",
-			Nickname:  "Max",
-			Country:   "DE",
-			Email:     "max@example.com",
-			CreatedAt: "2019-10-12T07:20:50.52Z",
-			UpdatedAt: "2019-10-12T07:20:50.52Z",
-		},
-		{
-			Id:        "f960ff54-0de7-4022-9528-7d6e50fe2d7e",
-			FirstName: "Samuel",
-			LastName:  "Wilson",
-			Nickname:  "Sam",
-			Country:   "UK",
-			Email:     "sam@example.com",
-			CreatedAt: "2019-10-12T07:20:50.52Z",
-			UpdatedAt: "2019-10-12T07:20:50.52Z",
-		},
+func (us *UserService) GetUsers(ctx context.Context, logger *zerolog.Logger, queryParams models.GetUserQueryParams) ([]models.User, error) {
+	users, err := us.storage.GetAll(ctx)
+	if err != nil {
+		return nil, err
 	}
-
-	return mockedUsers, nil
+	return users, nil
 }
 
-func (us *UserService) GetUserById(logger *zerolog.Logger, userId string) (models.User, error) {
-	// TODO: implement
-
-	mockedUser := models.User{
-		Id:        userId,
-		FirstName: "Maximilian",
-		LastName:  "Mustermann",
-		Nickname:  "Max",
-		Country:   "DE",
-		Email:     "max@example.com",
-		CreatedAt: "2019-10-12T07:20:50.52Z",
-		UpdatedAt: "2019-10-12T07:20:50.52Z",
+func (us *UserService) GetUserById(ctx context.Context, logger *zerolog.Logger, userId string) (*models.User, error) {
+	user, err := us.storage.GetById(ctx, userId)
+	if err != nil {
+		return nil, err
 	}
-
-	return mockedUser, nil
+	return user, nil
 }
 
 func (us *UserService) UpdateUserById(logger *zerolog.Logger, userId string, userCreation models.UserCreation) error {

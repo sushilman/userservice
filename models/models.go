@@ -1,6 +1,8 @@
 package models
 
-// used for the POST request - to accept the payload
+import "time"
+
+// used for the POST and PUT request - to accept the payload
 type UserCreation struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -10,16 +12,31 @@ type UserCreation struct {
 	Country   string `json:"country"`
 }
 
+func (uc *UserCreation) ToUser() User {
+	createdAt := time.Now().UTC().Format(time.RFC3339)
+
+	return User{
+		FirstName: uc.FirstName,
+		LastName:  uc.LastName,
+		Nickname:  uc.Nickname,
+		Email:     uc.Email,
+		Country:   uc.Country,
+		CreatedAt: createdAt,
+		UpdatedAt: createdAt,
+	}
+}
+
 // used for the GET request - as the response payload
+// also reused as the DB model (to keep things simple)
 type User struct {
-	Id        string `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Nickname  string `json:"nickname"`
-	Email     string `json:"email"`
-	Country   string `json:"country"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	Id        string `json:"id" bson:"id"`
+	FirstName string `json:"first_name" bson:"first_name"`
+	LastName  string `json:"last_name" bson:"last_name"`
+	Nickname  string `json:"nickname" bson:"nickname"`
+	Email     string `json:"email" bson:"email"`
+	Country   string `json:"country" bson:"country"`
+	CreatedAt string `json:"created_at" bson:"created_at"`
+	UpdatedAt string `json:"updated_at" bson:"modified_at"`
 }
 
 // used as the response payload for the POST request
