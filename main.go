@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/api/apiuser"
 	"github.com/sushilman/userservice/db"
+	"github.com/sushilman/userservice/messagebroker"
 	"github.com/sushilman/userservice/services"
 )
 
@@ -29,6 +30,9 @@ func main() {
 	dbUri := os.Getenv("DB_URI")
 	database := db.InitDB(ctx, &logger, dbUri)
 
+	// Initializing message broker
+	messagebroker := messagebroker.InitMessageBroker()
+
 	router := gin.Default()
 
 	router.Use(func(c *gin.Context) {
@@ -43,7 +47,7 @@ func main() {
 	})
 
 	userStorage := db.NewStorage(database)
-	userservice := services.NewUserService(userStorage)
+	userservice := services.NewUserService(userStorage, messagebroker)
 	apiuser.InitRoutes(ctx, &logger, router, userservice)
 
 	router.Run()

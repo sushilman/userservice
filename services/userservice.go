@@ -7,16 +7,19 @@ import (
 	"github.com/google/uuid"
 	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/db"
+	"github.com/sushilman/userservice/events"
+	"github.com/sushilman/userservice/messagebroker"
 	"github.com/sushilman/userservice/models"
 	"github.com/sushilman/userservice/utils"
 )
 
 type UserService struct {
 	storage db.IUserStorage
+	broker  messagebroker.IMessageBroker
 }
 
-func NewUserService(storage db.IUserStorage) *UserService {
-	return &UserService{storage}
+func NewUserService(storage db.IUserStorage, broker messagebroker.IMessageBroker) *UserService {
+	return &UserService{storage, broker}
 }
 
 func (us *UserService) CreateUser(ctx context.Context, logger *zerolog.Logger, userCreation models.UserCreation) (string, error) {
@@ -28,7 +31,7 @@ func (us *UserService) CreateUser(ctx context.Context, logger *zerolog.Logger, u
 		return "", errHash
 	}
 
-	us.storage.Insert(ctx, models.User{
+	user := models.User{
 		Id:        newUserId,
 		FirstName: userCreation.FirstName,
 		LastName:  userCreation.LastName,
@@ -38,7 +41,14 @@ func (us *UserService) CreateUser(ctx context.Context, logger *zerolog.Logger, u
 		Country:   userCreation.Country,
 		CreatedAt: createdAt,
 		UpdatedAt: createdAt,
-	})
+	}
+
+	err := us.storage.Insert(ctx, user)
+	if err != nil {
+		return "", err
+	}
+
+	us.broker.Publish(logger, events.USER_CREATED_TOPIC, events.UserCreatedEvent(user))
 
 	return newUserId, nil
 }
@@ -67,7 +77,7 @@ func (us *UserService) UpdateUser(ctx context.Context, logger *zerolog.Logger, u
 		return errHash
 	}
 
-	err := us.storage.Update(ctx, models.User{
+	user := models.User{
 		Id:        userId,
 		FirstName: userCreation.FirstName,
 		LastName:  userCreation.LastName,
@@ -76,11 +86,15 @@ func (us *UserService) UpdateUser(ctx context.Context, logger *zerolog.Logger, u
 		Email:     userCreation.Email,
 		Country:   userCreation.Country,
 		UpdatedAt: updatedAt,
-	})
+	}
+
+	err := us.storage.Update(ctx, user)
 
 	if err != nil {
 		return err
 	}
+
+	us.broker.Publish(logger, events.USER_UPDATED_TOPIC, events.UserUpdatedEvent(user))
 
 	return nil
 }
@@ -90,6 +104,8 @@ func (us *UserService) DeleteUserById(ctx context.Context, logger *zerolog.Logge
 	if err != nil {
 		return err
 	}
+
+	us.broker.Publish(logger, events.USER_UPDATED_TOPIC, events.UserDeletedEvent{Id: userId})
 
 	return nil
 }
