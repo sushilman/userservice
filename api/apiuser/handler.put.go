@@ -13,7 +13,7 @@ import (
 	"gitlab.valiton.com/cidm/services-commons-api/apierrors"
 )
 
-func UpdateUserByIdHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
+func UpdateUserHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var userCreation models.UserCreation
 		errBindJSON := c.BindJSON(&userCreation)
@@ -25,8 +25,14 @@ func UpdateUserByIdHandler(ctx context.Context, logger *zerolog.Logger, s db.ISt
 
 		userService := services.NewUserService(s)
 
-		err := userService.UpdateUserById(logger, c.Param("userId"), userCreation)
+		err := userService.UpdateUser(ctx, logger, c.Param("userId"), userCreation)
 		if err != nil {
+			// TODO handle with custom error type
+			// and respond with proper error json format
+			if err.Error() == "not_found" {
+				c.Status(http.StatusNotFound)
+				return
+			}
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
 			return
 		}

@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/sushilman/userservice/models"
@@ -18,6 +19,7 @@ type IStorage interface {
 	Insert(context.Context, models.User) error
 	GetAll(context.Context) ([]models.User, error)
 	GetById(context.Context, string) (*models.User, error)
+	Update(context.Context, models.User) (bool, error)
 }
 
 // implements the IStorage interface
@@ -70,8 +72,29 @@ func (s *storage) GetById(ctx context.Context, id string) (*models.User, error) 
 
 	// return empty document if not found
 	if err == mongo.ErrNoDocuments {
-		return nil, nil
+		return nil, errors.New("not_found")
 	}
 
 	return &user, err
+}
+
+func (s *storage) Update(ctx context.Context, user models.User) (bool, error) {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
+
+	filter := bson.M{"id": user.Id}
+	userUpdate := bson.M{"$set": user}
+
+	updateResult, err := s.database.Collection(COLLECTION).UpdateOne(ctx, filter, userUpdate)
+
+	if err != nil {
+		return false, err
+	}
+
+	// No match was found for the given ID
+	if updateResult.MatchedCount == 0 {
+		return false, nil
+	}
+
+	return true, nil
 }

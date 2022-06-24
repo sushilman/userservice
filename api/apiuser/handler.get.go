@@ -78,6 +78,10 @@ func GetUserByIdHandler(ctx context.Context, logger *zerolog.Logger, s db.IStora
 
 		user, err := userservice.GetUserById(ctx, logger, c.Param("userId"))
 		if err != nil {
+			if err.Error() == "not_found" {
+				c.Status(http.StatusNotFound)
+				return
+			}
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
 			return
 		}

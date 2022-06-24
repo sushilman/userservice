@@ -35,7 +35,7 @@ type User struct {
 	Nickname  string `json:"nickname" bson:"nickname"`
 	Email     string `json:"email" bson:"email"`
 	Country   string `json:"country" bson:"country"`
-	CreatedAt string `json:"created_at" bson:"created_at"`
+	CreatedAt string `json:"created_at" bson:"created_at,omitempty"`
 	UpdatedAt string `json:"updated_at" bson:"modified_at"`
 }
 
