@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/sushilman/userservice/models"
@@ -18,7 +19,7 @@ const (
 
 type IUserStorage interface {
 	Insert(context.Context, models.User) error
-	GetAll(context.Context, uint, uint) ([]models.User, error)
+	GetAll(context.Context, models.GetUserQueryParams) ([]models.User, error)
 	GetById(context.Context, string) (*models.User, error)
 	Update(context.Context, models.User) (bool, error)
 	DeleteById(context.Context, string) error
@@ -45,15 +46,27 @@ func (s *userstorage) Insert(ctx context.Context, user models.User) error {
 }
 
 //TODO: implement filtering by query params
-func (s *userstorage) GetAll(ctx context.Context, offset uint, limit uint) (users []models.User, err error) {
+func (s *userstorage) GetAll(ctx context.Context, queryParams models.GetUserQueryParams) (users []models.User, err error) {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
 
 	filter := bson.M{}
+	if queryParams.Country != "" {
+		filter["country"] = strings.ToUpper(queryParams.Country)
+	}
+	if queryParams.FirstName != "" {
+		filter["first_name"] = queryParams.FirstName
+	}
+	if queryParams.LastName != "" {
+		filter["last_name"] = queryParams.LastName
+	}
+	if queryParams.Email != "" {
+		filter["email"] = queryParams.Email
+	}
 
 	opts := options.Find()
-	opts.SetSkip(int64(offset))
-	opts.SetLimit(int64(limit))
+	opts.SetSkip(int64(queryParams.Offset))
+	opts.SetLimit(int64(queryParams.Limit))
 
 	cursor, err := s.database.Collection(COLLECTION).Find(ctx, filter, opts)
 	if err != nil {

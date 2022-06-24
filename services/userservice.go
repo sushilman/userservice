@@ -28,6 +28,7 @@ func (us *UserService) CreateUser(ctx context.Context, logger *zerolog.Logger, u
 		FirstName: userCreation.FirstName,
 		LastName:  userCreation.LastName,
 		Nickname:  userCreation.Nickname,
+		Password:  userCreation.Password,
 		Email:     userCreation.Email,
 		Country:   userCreation.Country,
 		CreatedAt: createdAt,
@@ -38,7 +39,7 @@ func (us *UserService) CreateUser(ctx context.Context, logger *zerolog.Logger, u
 }
 
 func (us *UserService) GetUsers(ctx context.Context, logger *zerolog.Logger, queryParams models.GetUserQueryParams) ([]models.User, error) {
-	users, err := us.storage.GetAll(ctx, queryParams.Offset, queryParams.Limit)
+	users, err := us.storage.GetAll(ctx, queryParams)
 	if err != nil {
 		return nil, err
 	}
@@ -60,6 +61,7 @@ func (us *UserService) UpdateUser(ctx context.Context, logger *zerolog.Logger, u
 		FirstName: userCreation.FirstName,
 		LastName:  userCreation.LastName,
 		Nickname:  userCreation.Nickname,
+		Password:  userCreation.Password,
 		Email:     userCreation.Email,
 		Country:   userCreation.Country,
 		UpdatedAt: updatedAt,
