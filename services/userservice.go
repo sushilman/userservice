@@ -115,7 +115,7 @@ func (us *UserService) DeleteUserById(userId string) error {
 		return err
 	}
 
-	us.broker.Publish(events.USER_UPDATED_TOPIC, events.UserDeletedEvent{Id: userId})
+	us.broker.Publish(events.USER_DELETED_TOPIC, events.UserDeletedEvent{Id: userId})
 
 	return nil
 }

@@ -1,4 +1,4 @@
-package services
+package mocks
 
 import (
 	"github.com/stretchr/testify/mock"
@@ -21,15 +21,21 @@ func (m *MockUserService) DeleteUserById(userId string) error {
 
 func (m *MockUserService) GetUsers(q models.GetUserQueryParams) ([]models.User, error) {
 	args := m.Called(q)
-	return nil, args.Error(1)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]models.User), args.Error(1)
 }
 
 func (m *MockUserService) GetUserById(userId string) (*models.User, error) {
 	args := m.Called(userId)
-	return nil, args.Error(1)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*models.User), args.Error(1)
 }
 
-func (m *MockUserService) UpdateUser(userId string, uc models.UserCreation) error {
-	args := m.Called(userId)
+func (m *MockUserService) UpdateUser(userId string, user models.UserCreation) error {
+	args := m.Called(userId, user)
 	return args.Error(0)
 }
