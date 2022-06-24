@@ -1,7 +1,6 @@
 package apiuser
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/sushilman/userservice/usererrors"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/services"
 )
 
@@ -17,7 +15,7 @@ const (
 	DefaultLimit = 16
 )
 
-func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
+func GetUsersHandler(userService services.IUserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var queryParams models.GetUserQueryParams
 		errBind := c.BindQuery(&queryParams)
@@ -27,12 +25,12 @@ func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, userService *s
 		}
 
 		if errBind != nil {
-			logger.Error().Err(errBind).Msg("GetUserHandler: Error when binding the query parameters")
+			fmt.Printf("GetUserHandler: Error when binding the query parameters. Error: %+v", errBind)
 			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad query parameters"))
 			return
 		}
 
-		users, err := userService.GetUsers(ctx, logger, queryParams)
+		users, err := userService.GetUsers(queryParams)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
@@ -70,9 +68,9 @@ func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, userService *s
 	}
 }
 
-func GetUserByIdHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
+func GetUserByIdHandler(userService services.IUserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		user, err := userService.GetUserById(ctx, logger, c.Param("userId"))
+		user, err := userService.GetUserById(c.Param("userId"))
 		if err != nil {
 			switch err.(type) {
 			case *usererrors.NotFoundError:

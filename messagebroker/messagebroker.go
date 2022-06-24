@@ -1,12 +1,13 @@
 package messagebroker
 
 import (
+	"fmt"
+
 	"github.com/goccy/go-json"
-	"github.com/rs/zerolog"
 )
 
 type IMessageBroker interface {
-	Publish(*zerolog.Logger, string, interface{}) error
+	Publish(string, interface{}) error
 }
 
 // This is simply a mock implementation of the message broker emulator
@@ -16,8 +17,8 @@ func InitMessageBroker() MessageBroker {
 	return MessageBroker{}
 }
 
-func (mb MessageBroker) Publish(logger *zerolog.Logger, topic string, message interface{}) error {
+func (mb MessageBroker) Publish(topic string, message interface{}) error {
 	msg, _ := json.Marshal(message)
-	logger.Info().Str("topic", topic).Str("message", string(msg)).Msg("Publishing to message broker ")
+	fmt.Printf("Publishing message to: \nTopic: %s \nMessage: %s", topic, string(msg))
 	return nil
 }

@@ -1,7 +1,6 @@
 package apiuser
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -9,7 +8,6 @@ import (
 	"github.com/sushilman/userservice/usererrors"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/services"
 )
 
@@ -17,7 +15,7 @@ const (
 	BASE_PATH = "/v1/users"
 )
 
-func PostUserHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
+func PostUserHandler(userService services.IUserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var userCreation models.UserCreation
 		errBindJSON := c.BindJSON(&userCreation)
@@ -27,7 +25,7 @@ func PostUserHandler(ctx context.Context, logger *zerolog.Logger, userService *s
 			return
 		}
 
-		userId, err := userService.CreateUser(ctx, logger, userCreation)
+		userId, err := userService.CreateUser(userCreation)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return

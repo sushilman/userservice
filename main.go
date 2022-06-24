@@ -1,12 +1,10 @@
 package main
 
 import (
-	"context"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/api/apiuser"
 	"github.com/sushilman/userservice/db"
 	"github.com/sushilman/userservice/messagebroker"
@@ -19,16 +17,9 @@ const (
 )
 
 func main() {
-	// initializing the logger
-	// better to set the log level should using the environment variable
-	zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	logger := zerolog.New(os.Stderr).With().Timestamp().Caller().Str("service", serviceName).Logger()
-
-	ctx := context.Background()
-
 	// Establishing database connection and initializing the DB
 	dbUri := os.Getenv("DB_URI")
-	database := db.InitDB(ctx, &logger, dbUri)
+	database := db.InitDB(dbUri)
 
 	// Initializing message broker
 	messagebroker := messagebroker.InitMessageBroker()
@@ -48,7 +39,7 @@ func main() {
 
 	userStorage := db.NewStorage(database)
 	userservice := services.NewUserService(userStorage, messagebroker)
-	apiuser.InitRoutes(ctx, &logger, router, userservice)
+	apiuser.InitRoutes(router, userservice)
 
 	router.Run()
 }
