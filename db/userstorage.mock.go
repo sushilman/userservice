@@ -7,11 +7,11 @@ import (
 	"github.com/sushilman/userservice/models"
 )
 
-type MockStorage struct {
+type MockUserStorage struct {
 	mock.Mock
 }
 
-func (m *MockStorage) Insert(ctx context.Context, user models.User) error {
+func (m *MockUserStorage) Insert(ctx context.Context, user models.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
 }

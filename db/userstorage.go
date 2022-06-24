@@ -15,7 +15,7 @@ const (
 	COLLECTION   = "users"
 )
 
-type IStorage interface {
+type IUserStorage interface {
 	Insert(context.Context, models.User) error
 	GetAll(context.Context) ([]models.User, error)
 	GetById(context.Context, string) (*models.User, error)
@@ -24,17 +24,17 @@ type IStorage interface {
 }
 
 // implements the IStorage interface
-type storage struct {
+type userstorage struct {
 	database *mongo.Database
 }
 
-func NewStorage(database *mongo.Database) IStorage {
-	return &storage{
+func NewStorage(database *mongo.Database) IUserStorage {
+	return &userstorage{
 		database,
 	}
 }
 
-func (s *storage) Insert(ctx context.Context, user models.User) error {
+func (s *userstorage) Insert(ctx context.Context, user models.User) error {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
 
@@ -44,7 +44,7 @@ func (s *storage) Insert(ctx context.Context, user models.User) error {
 }
 
 //TODO: implement filtering by query params
-func (s *storage) GetAll(ctx context.Context) (users []models.User, err error) {
+func (s *userstorage) GetAll(ctx context.Context) (users []models.User, err error) {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
 
@@ -63,7 +63,7 @@ func (s *storage) GetAll(ctx context.Context) (users []models.User, err error) {
 	return users, nil
 }
 
-func (s *storage) GetById(ctx context.Context, id string) (*models.User, error) {
+func (s *userstorage) GetById(ctx context.Context, id string) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
 
@@ -79,7 +79,7 @@ func (s *storage) GetById(ctx context.Context, id string) (*models.User, error) 
 	return &user, err
 }
 
-func (s *storage) Update(ctx context.Context, user models.User) (bool, error) {
+func (s *userstorage) Update(ctx context.Context, user models.User) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
 
@@ -100,7 +100,7 @@ func (s *storage) Update(ctx context.Context, user models.User) (bool, error) {
 	return true, nil
 }
 
-func (s *storage) DeleteById(ctx context.Context, id string) error {
+func (s *userstorage) DeleteById(ctx context.Context, id string) error {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
 
