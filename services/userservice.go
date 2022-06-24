@@ -38,7 +38,7 @@ func (us *UserService) CreateUser(ctx context.Context, logger *zerolog.Logger, u
 }
 
 func (us *UserService) GetUsers(ctx context.Context, logger *zerolog.Logger, queryParams models.GetUserQueryParams) ([]models.User, error) {
-	users, err := us.storage.GetAll(ctx)
+	users, err := us.storage.GetAll(ctx, queryParams.Offset, queryParams.Limit)
 	if err != nil {
 		return nil, err
 	}

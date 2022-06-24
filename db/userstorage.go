@@ -8,6 +8,7 @@ import (
 	"github.com/sushilman/userservice/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 
 type IUserStorage interface {
 	Insert(context.Context, models.User) error
-	GetAll(context.Context) ([]models.User, error)
+	GetAll(context.Context, uint, uint) ([]models.User, error)
 	GetById(context.Context, string) (*models.User, error)
 	Update(context.Context, models.User) (bool, error)
 	DeleteById(context.Context, string) error
@@ -44,12 +45,17 @@ func (s *userstorage) Insert(ctx context.Context, user models.User) error {
 }
 
 //TODO: implement filtering by query params
-func (s *userstorage) GetAll(ctx context.Context) (users []models.User, err error) {
+func (s *userstorage) GetAll(ctx context.Context, offset uint, limit uint) (users []models.User, err error) {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
 
 	filter := bson.M{}
-	cursor, err := s.database.Collection(COLLECTION).Find(ctx, filter)
+
+	opts := options.Find()
+	opts.SetSkip(int64(offset))
+	opts.SetLimit(int64(limit))
+
+	cursor, err := s.database.Collection(COLLECTION).Find(ctx, filter, opts)
 	if err != nil {
 		return nil, err
 	}
