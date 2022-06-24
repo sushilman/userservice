@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/api/apiuser"
 	"github.com/sushilman/userservice/db"
+	"github.com/sushilman/userservice/services"
 )
 
 const (
@@ -39,7 +40,8 @@ func main() {
 		})
 	})
 
-	apiuser.InitRoutes(ctx, &logger, router, userStorage)
+	userservice := services.NewUserService(userStorage)
+	apiuser.InitRoutes(ctx, &logger, router, userservice)
 
 	router.Run()
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sushilman/userservice/db"
 	"github.com/sushilman/userservice/models"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +17,7 @@ const (
 	BASE_PATH = "/v1/users"
 )
 
-func PostUserHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
+func PostUserHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var userCreation models.UserCreation
 		errBindJSON := c.BindJSON(&userCreation)
@@ -27,8 +26,6 @@ func PostUserHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage)
 			c.AbortWithStatusJSON(http.StatusBadRequest, apierrors.NewBadRequestErrorResponse())
 			return
 		}
-
-		userService := services.NewUserService(s)
 
 		userId, err := userService.CreateUser(ctx, logger, userCreation)
 		if err != nil {

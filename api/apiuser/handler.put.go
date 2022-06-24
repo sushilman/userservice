@@ -7,13 +7,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
-	"github.com/sushilman/userservice/db"
 	"github.com/sushilman/userservice/models"
 	"github.com/sushilman/userservice/services"
 	"gitlab.valiton.com/cidm/services-commons-api/apierrors"
 )
 
-func UpdateUserHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
+func UpdateUserHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var userCreation models.UserCreation
 		errBindJSON := c.BindJSON(&userCreation)
@@ -22,8 +21,6 @@ func UpdateUserHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorag
 			c.AbortWithStatusJSON(http.StatusBadRequest, apierrors.NewBadRequestErrorResponse())
 			return
 		}
-
-		userService := services.NewUserService(s)
 
 		err := userService.UpdateUser(ctx, logger, c.Param("userId"), userCreation)
 		if err != nil {

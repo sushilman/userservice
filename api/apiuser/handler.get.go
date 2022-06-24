@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sushilman/userservice/db"
 	"github.com/sushilman/userservice/models"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +17,7 @@ const (
 	DefaultLimit = 16
 )
 
-func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
+func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var queryParams models.GetUserQueryParams
 		errBind := c.BindQuery(&queryParams)
@@ -32,8 +31,6 @@ func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage)
 			c.AbortWithStatusJSON(http.StatusBadRequest, apierrors.NewBadRequestErrorResponse())
 			return
 		}
-
-		userService := services.NewUserService(s)
 
 		users, err := userService.GetUsers(ctx, logger, queryParams)
 		if err != nil {
@@ -72,11 +69,9 @@ func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage)
 	}
 }
 
-func GetUserByIdHandler(ctx context.Context, logger *zerolog.Logger, s db.IStorage) func(c *gin.Context) {
+func GetUserByIdHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		userservice := services.NewUserService(s)
-
-		user, err := userservice.GetUserById(ctx, logger, c.Param("userId"))
+		user, err := userService.GetUserById(ctx, logger, c.Param("userId"))
 		if err != nil {
 			if err.Error() == "not_found" {
 				c.Status(http.StatusNotFound)
