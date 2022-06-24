@@ -28,13 +28,13 @@ func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, userService *s
 
 		if errBind != nil {
 			logger.Error().Err(errBind).Msg("GetUserHandler: Error when binding the query parameters")
-			c.AbortWithStatusJSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad query parameters"))
+			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad query parameters"))
 			return
 		}
 
 		users, err := userService.GetUsers(ctx, logger, queryParams)
 		if err != nil {
-			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
+			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}
 
@@ -51,7 +51,8 @@ func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, userService *s
 			prevPage = ""
 		}
 
-		// TODO: handle when the returned users are exactly 16 and it is the last page
+		// TODO: handle when the returned users are exactly the `limit` size and it is the last page
+		// the idea could be to always fetch `limit+1` from DB but return only up to `limit` in the reponse
 		if len(users) < int(queryParams.Limit) {
 			nextPage = ""
 		}
@@ -75,11 +76,11 @@ func GetUserByIdHandler(ctx context.Context, logger *zerolog.Logger, userService
 		if err != nil {
 			switch err.(type) {
 			case *usererrors.NotFoundError:
-				c.PureJSON(http.StatusNotFound, usererrors.NewNotFoundErrorResponse("user not found"))
+				c.JSON(http.StatusNotFound, usererrors.NewNotFoundErrorResponse("user not found"))
 				return
 			}
 
-			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
+			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}
 

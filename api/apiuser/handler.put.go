@@ -18,7 +18,7 @@ func UpdateUserHandler(ctx context.Context, logger *zerolog.Logger, userService 
 		errBindJSON := c.BindJSON(&userCreation)
 		if errBindJSON != nil {
 			fmt.Printf("PostUserHandler: Error when binding request body")
-			c.AbortWithStatusJSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad payload"))
+			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad payload"))
 			return
 		}
 
@@ -26,11 +26,11 @@ func UpdateUserHandler(ctx context.Context, logger *zerolog.Logger, userService 
 		if err != nil {
 			switch err.(type) {
 			case *usererrors.NotFoundError:
-				c.PureJSON(http.StatusNotFound, usererrors.NewNotFoundErrorResponse("user not found"))
+				c.JSON(http.StatusNotFound, usererrors.NewNotFoundErrorResponse("User not found"))
 				return
 			}
 
-			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
+			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}
 

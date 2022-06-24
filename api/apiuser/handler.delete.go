@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/services"
+	"github.com/sushilman/userservice/usererrors"
 )
 
 func DeleteUserByIdHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
@@ -14,7 +15,7 @@ func DeleteUserByIdHandler(ctx context.Context, logger *zerolog.Logger, userServ
 
 		err := userService.DeleteUserById(ctx, logger, c.Param("userId"))
 		if err != nil {
-			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
+			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}
 

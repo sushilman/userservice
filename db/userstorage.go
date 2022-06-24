@@ -45,7 +45,6 @@ func (s *userstorage) Insert(ctx context.Context, user models.User) error {
 	return err // 'nil' if successful
 }
 
-//TODO: implement filtering by query params
 func (s *userstorage) GetAll(ctx context.Context, queryParams models.GetUserQueryParams) (users []models.User, err error) {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()

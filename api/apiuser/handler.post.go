@@ -23,13 +23,13 @@ func PostUserHandler(ctx context.Context, logger *zerolog.Logger, userService *s
 		errBindJSON := c.BindJSON(&userCreation)
 		if errBindJSON != nil {
 			fmt.Printf("PostUserHandler: Error when binding request body")
-			c.AbortWithStatusJSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad payload"))
+			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad payload"))
 			return
 		}
 
 		userId, err := userService.CreateUser(ctx, logger, userCreation)
 		if err != nil {
-			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
+			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}
 
