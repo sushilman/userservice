@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	queryTimeout = 5 * time.Second
+	QUERY_TIMEOUT = 5 * time.Second
 	COLLECTION   = "users"
 )
 
@@ -37,7 +37,7 @@ func NewStorage(database *mongo.Database) IUserStorage {
 }
 
 func (s *userstorage) Insert(user models.User) error {
-	ctx, cancel := context.WithTimeout(context.Background(), queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
 	defer cancel()
 
 	_, err := s.database.Collection(COLLECTION).InsertOne(ctx, user)
@@ -46,7 +46,7 @@ func (s *userstorage) Insert(user models.User) error {
 }
 
 func (s *userstorage) GetAll(queryParams models.GetUserQueryParams) (users []models.User, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
 	defer cancel()
 
 	filter := bson.M{}
@@ -58,6 +58,9 @@ func (s *userstorage) GetAll(queryParams models.GetUserQueryParams) (users []mod
 	}
 	if queryParams.LastName != "" {
 		filter["last_name"] = queryParams.LastName
+	}
+	if queryParams.NickName != "" {
+		filter["nickname"] = queryParams.NickName
 	}
 	if queryParams.Email != "" {
 		filter["email"] = queryParams.Email
@@ -82,7 +85,7 @@ func (s *userstorage) GetAll(queryParams models.GetUserQueryParams) (users []mod
 }
 
 func (s *userstorage) GetById(id string) (*models.User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
 	defer cancel()
 
 	user := models.User{}
@@ -97,7 +100,7 @@ func (s *userstorage) GetById(id string) (*models.User, error) {
 }
 
 func (s *userstorage) Update(user models.User) error {
-	ctx, cancel := context.WithTimeout(context.Background(), queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
 	defer cancel()
 
 	filter := bson.M{"id": user.Id}
@@ -118,7 +121,7 @@ func (s *userstorage) Update(user models.User) error {
 }
 
 func (s *userstorage) DeleteById(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), queryTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
 	defer cancel()
 
 	query := bson.M{"id": id}

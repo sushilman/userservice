@@ -44,6 +44,7 @@ type GetUserQueryParams struct {
 	Country   string `form:"country"`
 	FirstName string `form:"first_name"`
 	LastName  string `form:"last_name"`
+	NickName  string `form:"nickname"`
 	Email     string `form:"email"`
 	Offset    uint   `form:"offset"`
 	Limit     uint   `form:"limit"`

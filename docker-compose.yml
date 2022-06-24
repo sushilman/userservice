@@ -6,3 +6,13 @@ services:
     container_name: userservicedb
     ports:
       - 27017:27017
+  userservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URI: mongodb://mongo:27017/users

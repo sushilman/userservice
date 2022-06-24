@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	DefaultLimit = 16
+	DEFAULT_PAGE_LIMIT = 16
 )
 
 func GetUsersHandler(userService services.IUserService) func(c *gin.Context) {
@@ -21,7 +21,7 @@ func GetUsersHandler(userService services.IUserService) func(c *gin.Context) {
 		errBind := c.BindQuery(&queryParams)
 
 		if queryParams.Limit == 0 {
-			queryParams.Limit = DefaultLimit
+			queryParams.Limit = DEFAULT_PAGE_LIMIT
 		}
 
 		if errBind != nil {

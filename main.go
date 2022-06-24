@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	serviceName = "User Service"
-	defaultport = "8080"
+	SERVICE_NAME = "User Service"
+	DEFAULT_PORT = "8080"
 )
 
 func main() {
