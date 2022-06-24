@@ -48,3 +48,8 @@ type GetUserQueryParams struct {
 	Offset    uint   `form:"offset"`
 	Limit     uint   `form:"limit"`
 }
+
+type ErrorResponse struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}

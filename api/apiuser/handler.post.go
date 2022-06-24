@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/sushilman/userservice/models"
+	"github.com/sushilman/userservice/usererrors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/services"
-	"gitlab.valiton.com/cidm/services-commons-api/apierrors"
 )
 
 const (
@@ -23,7 +23,7 @@ func PostUserHandler(ctx context.Context, logger *zerolog.Logger, userService *s
 		errBindJSON := c.BindJSON(&userCreation)
 		if errBindJSON != nil {
 			fmt.Printf("PostUserHandler: Error when binding request body")
-			c.AbortWithStatusJSON(http.StatusBadRequest, apierrors.NewBadRequestErrorResponse())
+			c.AbortWithStatusJSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad payload"))
 			return
 		}
 

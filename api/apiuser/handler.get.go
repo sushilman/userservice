@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/sushilman/userservice/models"
+	"github.com/sushilman/userservice/usererrors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"github.com/sushilman/userservice/services"
-	"gitlab.valiton.com/cidm/services-commons-api/apierrors"
 )
 
 const (
@@ -28,7 +28,7 @@ func GetUsersHandler(ctx context.Context, logger *zerolog.Logger, userService *s
 
 		if errBind != nil {
 			logger.Error().Err(errBind).Msg("GetUserHandler: Error when binding the query parameters")
-			c.AbortWithStatusJSON(http.StatusBadRequest, apierrors.NewBadRequestErrorResponse())
+			c.AbortWithStatusJSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad query parameters"))
 			return
 		}
 
@@ -73,10 +73,11 @@ func GetUserByIdHandler(ctx context.Context, logger *zerolog.Logger, userService
 	return func(c *gin.Context) {
 		user, err := userService.GetUserById(ctx, logger, c.Param("userId"))
 		if err != nil {
-			if err.Error() == "not_found" {
-				c.Status(http.StatusNotFound)
-				return
+			switch err.(type) {
+			case *usererrors.NotFoundError:
+				c.PureJSON(http.StatusNotFound, usererrors.NewNotFoundErrorResponse("user not found"))
 			}
+
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
 			return
 		}

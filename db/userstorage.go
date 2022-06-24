@@ -2,11 +2,11 @@ package db
 
 import (
 	"context"
-	"errors"
 	"strings"
 	"time"
 
 	"github.com/sushilman/userservice/models"
+	"github.com/sushilman/userservice/usererrors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -21,7 +21,7 @@ type IUserStorage interface {
 	Insert(context.Context, models.User) error
 	GetAll(context.Context, models.GetUserQueryParams) ([]models.User, error)
 	GetById(context.Context, string) (*models.User, error)
-	Update(context.Context, models.User) (bool, error)
+	Update(context.Context, models.User) error
 	DeleteById(context.Context, string) error
 }
 
@@ -90,15 +90,14 @@ func (s *userstorage) GetById(ctx context.Context, id string) (*models.User, err
 	query := bson.M{"id": id}
 	err := s.database.Collection(COLLECTION).FindOne(ctx, query).Decode(&user)
 
-	// return empty document if not found
 	if err == mongo.ErrNoDocuments {
-		return nil, errors.New("not_found")
+		return nil, &usererrors.NotFoundError{}
 	}
 
 	return &user, err
 }
 
-func (s *userstorage) Update(ctx context.Context, user models.User) (bool, error) {
+func (s *userstorage) Update(ctx context.Context, user models.User) error {
 	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
 	defer cancel()
 
@@ -108,15 +107,15 @@ func (s *userstorage) Update(ctx context.Context, user models.User) (bool, error
 	updateResult, err := s.database.Collection(COLLECTION).UpdateOne(ctx, filter, userUpdate)
 
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	// No match was found for the given ID
 	if updateResult.MatchedCount == 0 {
-		return false, nil
+		return &usererrors.NotFoundError{}
 	}
 
-	return true, nil
+	return nil
 }
 
 func (s *userstorage) DeleteById(ctx context.Context, id string) error {

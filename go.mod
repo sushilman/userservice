@@ -7,7 +7,6 @@ require github.com/gin-gonic/gin v1.8.1
 require (
 	github.com/google/uuid v1.3.0
 	github.com/rs/zerolog v1.27.0
-	gitlab.valiton.com/cidm/services-commons-api v1.1.1
 )
 
 require (

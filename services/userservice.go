@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -56,7 +55,7 @@ func (us *UserService) GetUserById(ctx context.Context, logger *zerolog.Logger, 
 
 func (us *UserService) UpdateUser(ctx context.Context, logger *zerolog.Logger, userId string, userCreation models.UserCreation) error {
 	updatedAt := time.Now().UTC().Format(time.RFC3339)
-	matchFound, err := us.storage.Update(ctx, models.User{
+	err := us.storage.Update(ctx, models.User{
 		Id:        userId,
 		FirstName: userCreation.FirstName,
 		LastName:  userCreation.LastName,
@@ -69,10 +68,6 @@ func (us *UserService) UpdateUser(ctx context.Context, logger *zerolog.Logger, u
 
 	if err != nil {
 		return err
-	}
-
-	if !matchFound {
-		return errors.New("not_found")
 	}
 
 	return nil
