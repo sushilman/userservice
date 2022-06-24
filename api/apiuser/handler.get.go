@@ -76,6 +76,7 @@ func GetUserByIdHandler(ctx context.Context, logger *zerolog.Logger, userService
 			switch err.(type) {
 			case *usererrors.NotFoundError:
 				c.PureJSON(http.StatusNotFound, usererrors.NewNotFoundErrorResponse("user not found"))
+				return
 			}
 
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")

@@ -24,12 +24,12 @@ func UpdateUserHandler(ctx context.Context, logger *zerolog.Logger, userService 
 
 		err := userService.UpdateUser(ctx, logger, c.Param("userId"), userCreation)
 		if err != nil {
-			// TODO handle with custom error type
-			// and respond with proper error json format
-			if err.Error() == "not_found" {
-				c.Status(http.StatusNotFound)
+			switch err.(type) {
+			case *usererrors.NotFoundError:
+				c.PureJSON(http.StatusNotFound, usererrors.NewNotFoundErrorResponse("user not found"))
 				return
 			}
+
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
 			return
 		}
