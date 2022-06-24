@@ -30,8 +30,6 @@ func main() {
 	dbUri := os.Getenv("DB_URI")
 	database := db.InitDB(ctx, &logger, dbUri)
 
-	userStorage := db.NewStorage(database)
-
 	router := gin.Default()
 
 	router.GET("/healthz", func(c *gin.Context) {
@@ -40,6 +38,7 @@ func main() {
 		})
 	})
 
+	userStorage := db.NewStorage(database)
 	userservice := services.NewUserService(userStorage)
 	apiuser.InitRoutes(ctx, &logger, router, userservice)
 

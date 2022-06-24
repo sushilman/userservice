@@ -12,7 +12,7 @@ import (
 func DeleteUserByIdHandler(ctx context.Context, logger *zerolog.Logger, userService *services.UserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 
-		err := userService.DeleteUserById(logger, c.Param("userId"))
+		err := userService.DeleteUserById(ctx, logger, c.Param("userId"))
 		if err != nil {
 			logger.Err(err).Msg("Something went wrong. TODO: Handle error")
 			return

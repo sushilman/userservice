@@ -76,7 +76,11 @@ func (us *UserService) UpdateUser(ctx context.Context, logger *zerolog.Logger, u
 	return nil
 }
 
-func (us *UserService) DeleteUserById(logger *zerolog.Logger, userId string) error {
-	// TODO: implement
+func (us *UserService) DeleteUserById(ctx context.Context, logger *zerolog.Logger, userId string) error {
+	err := us.storage.DeleteById(ctx, userId)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

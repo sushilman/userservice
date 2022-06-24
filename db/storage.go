@@ -20,6 +20,7 @@ type IStorage interface {
 	GetAll(context.Context) ([]models.User, error)
 	GetById(context.Context, string) (*models.User, error)
 	Update(context.Context, models.User) (bool, error)
+	DeleteById(context.Context, string) error
 }
 
 // implements the IStorage interface
@@ -97,4 +98,18 @@ func (s *storage) Update(ctx context.Context, user models.User) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (s *storage) DeleteById(ctx context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(ctx, queryTimeout)
+	defer cancel()
+
+	query := bson.M{"id": id}
+	_, err := s.database.Collection(COLLECTION).DeleteOne(ctx, query)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
