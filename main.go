@@ -18,9 +18,8 @@ const (
 )
 
 func main() {
-
 	// initializing the logger
-	// log level should be set using environment variable
+	// better to set the log level should using the environment variable
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 	logger := zerolog.New(os.Stderr).With().Timestamp().Caller().Str("service", serviceName).Logger()
 
