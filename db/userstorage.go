@@ -1,3 +1,5 @@
+// Storage layer which hides/encapsulates the underlying DB for the service layer
+
 package db
 
 import (

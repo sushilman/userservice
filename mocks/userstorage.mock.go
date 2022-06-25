@@ -1,3 +1,4 @@
+// Mock for UserStorage
 package mocks
 
 import (

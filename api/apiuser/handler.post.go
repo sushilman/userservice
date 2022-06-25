@@ -1,3 +1,5 @@
+// Handler for POST /v1/users
+
 package apiuser
 
 import (

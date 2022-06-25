@@ -1,3 +1,5 @@
+// Handler for GET /v1/users and GET /v1/users/:userId
+
 package apiuser
 
 import (

@@ -1,3 +1,5 @@
+// Handle the Mongo DB connection
+
 package db
 
 import (

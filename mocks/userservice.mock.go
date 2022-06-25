@@ -1,3 +1,4 @@
+// Mock for services.UserService
 package mocks
 
 import (

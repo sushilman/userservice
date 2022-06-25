@@ -1,5 +1,7 @@
 package events
 
+//
+
 import "github.com/sushilman/userservice/models"
 
 const (

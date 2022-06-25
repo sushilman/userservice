@@ -1,3 +1,4 @@
+// Custom Errors
 package usererrors
 
 import (

@@ -1,3 +1,5 @@
+// Handler for DELETE /v1/users/:userId
+
 package apiuser
 
 import (

@@ -1,3 +1,5 @@
+// Handler for PUT /v1/users/:userId
+
 package apiuser
 
 import (

@@ -1,3 +1,4 @@
+// Service layer that separates the api layer and the DB layer
 package services
 
 import (

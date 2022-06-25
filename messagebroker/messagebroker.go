@@ -1,3 +1,5 @@
+// Dummy message broker emulator
+
 package messagebroker
 
 import (
