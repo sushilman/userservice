@@ -15,8 +15,15 @@ func UpdateUserHandler(userService services.IUserService) func(c *gin.Context) {
 		var userCreation models.UserCreation
 		errBindJSON := c.BindJSON(&userCreation)
 		if errBindJSON != nil {
-			fmt.Printf("PostUserHandler: Error when binding request body")
+			fmt.Printf("Error when binding request body")
 			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("Bad Payload"))
+			return
+		}
+
+		invalidFields := validatePayload(userCreation)
+		if len(invalidFields) != 0 {
+			fmt.Println("Payload validation error. Invalid fields: ", invalidFields)
+			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse(fmt.Sprint("Validation Error. Invalid fields: ", invalidFields)))
 			return
 		}
 
@@ -28,6 +35,7 @@ func UpdateUserHandler(userService services.IUserService) func(c *gin.Context) {
 				return
 			}
 
+			fmt.Printf("Error when updating the user. Error: %+v", err)
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}

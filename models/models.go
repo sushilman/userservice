@@ -2,11 +2,11 @@ package models
 
 // used for the POST and PUT request - to accept the payload
 type UserCreation struct {
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	FirstName string `json:"first_name" validate:"required"`
+	LastName  string `json:"last_name" validate:"required"`
 	Nickname  string `json:"nickname"`
-	Password  string `json:"password"`
-	Email     string `json:"email"`
+	Password  string `json:"password" validate:"required"`
+	Email     string `json:"email" validate:"required,email"`
 	Country   string `json:"country"`
 }
 

@@ -25,13 +25,14 @@ func GetUsersHandler(userService services.IUserService) func(c *gin.Context) {
 		}
 
 		if errBind != nil {
-			fmt.Printf("GetUserHandler: Error when binding the query parameters. Error: %+v", errBind)
+			fmt.Printf("Error when binding the query parameters.\nError: %+v", errBind)
 			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad query parameters"))
 			return
 		}
 
 		users, err := userService.GetUsers(queryParams)
 		if err != nil {
+			fmt.Printf("Error while fetching users.\nError: %+v", err)
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}
@@ -78,6 +79,7 @@ func GetUserByIdHandler(userService services.IUserService) func(c *gin.Context) 
 				return
 			}
 
+			fmt.Printf("Error while fetching user by ID.\nError: %+v", err)
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}

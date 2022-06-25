@@ -33,3 +33,12 @@ func InitDB(dbUri string) *mongo.Database {
 
 	return client.Database(connectionString.Database)
 }
+
+func CloseDB(ctx context.Context, db *mongo.Database) {
+	ctx, cancel := context.WithTimeout(ctx, DB_TIMEOUT)
+	defer cancel()
+
+	if err := db.Client().Disconnect(ctx); err != nil {
+		fmt.Printf("Error while closing DB connection. Error: %+v", err)
+	}
+}

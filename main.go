@@ -1,8 +1,14 @@
 package main
 
 import (
+	"context"
+	"errors"
+	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sushilman/userservice/api/apiuser"
@@ -12,8 +18,9 @@ import (
 )
 
 const (
-	SERVICE_NAME = "User Service"
-	DEFAULT_PORT = "8080"
+	SERVICE_NAME              = "User Service"
+	DEFAULT_PORT              = "8080"
+	GRACEFUL_SHUTDOWN_TIMEOUT = 25
 )
 
 func main() {
@@ -41,5 +48,24 @@ func main() {
 	userservice := services.NewUserService(userStorage, messagebroker)
 	apiuser.InitRoutes(router, userservice)
 
-	router.Run()
+	srv := &http.Server{
+		Addr:    ":" + DEFAULT_PORT,
+		Handler: router,
+	}
+
+	go func() {
+		err := srv.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			fmt.Printf("Unable to start the server")
+			os.Exit(1)
+		}
+	}()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(GRACEFUL_SHUTDOWN_TIMEOUT)*time.Second)
+	defer cancel()
+	db.CloseDB(ctx, database)
 }

@@ -14,9 +14,10 @@ import (
 
 const (
 	QUERY_TIMEOUT = 5 * time.Second
-	COLLECTION   = "users"
+	COLLECTION    = "users"
 )
 
+// DB CRUD opertions for the 'users' collection
 type IUserStorage interface {
 	Insert(models.User) error
 	GetAll(models.GetUserQueryParams) ([]models.User, error)
@@ -25,7 +26,7 @@ type IUserStorage interface {
 	DeleteById(string) error
 }
 
-// implements the IStorage interface
+// implements the IUserStorage interface
 type userstorage struct {
 	database *mongo.Database
 }
