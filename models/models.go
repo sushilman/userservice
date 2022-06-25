@@ -21,7 +21,7 @@ type User struct {
 	Email     string `json:"email" bson:"email"`
 	Country   string `json:"country" bson:"country"`
 	CreatedAt string `json:"created_at" bson:"created_at,omitempty"`
-	UpdatedAt string `json:"updated_at" bson:"modified_at"`
+	UpdatedAt string `json:"updated_at" bson:"updated_at"`
 }
 
 // used as the response payload for the POST request
