@@ -4,6 +4,7 @@ package apiuser
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/sushilman/userservice/models"
@@ -27,14 +28,14 @@ func GetUsersHandler(userService services.IUserService) func(c *gin.Context) {
 		}
 
 		if errBind != nil {
-			fmt.Printf("Error when binding the query parameters.\nError: %+v", errBind)
+			log.Printf("Error when binding the query parameters.\nError: %+v", errBind)
 			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad query parameters"))
 			return
 		}
 
-		users, err := userService.GetUsers(queryParams)
+		users, err := userService.GetUsers(c, queryParams)
 		if err != nil {
-			fmt.Printf("Error while fetching users.\nError: %+v", err)
+			log.Printf("Error while fetching users.\nError: %+v", err)
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}
@@ -73,7 +74,7 @@ func GetUsersHandler(userService services.IUserService) func(c *gin.Context) {
 
 func GetUserByIdHandler(userService services.IUserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		user, err := userService.GetUserById(c.Param("userId"))
+		user, err := userService.GetUserById(c, c.Param("userId"))
 		if err != nil {
 			switch err.(type) {
 			case *usererrors.NotFoundError:
@@ -81,7 +82,7 @@ func GetUserByIdHandler(userService services.IUserService) func(c *gin.Context) 
 				return
 			}
 
-			fmt.Printf("Error while fetching user by ID.\nError: %+v", err)
+			log.Printf("Error while fetching user by ID.\nError: %+v", err)
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}

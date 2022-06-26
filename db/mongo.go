@@ -4,8 +4,7 @@ package db
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,8 +19,7 @@ const (
 func InitDB(dbUri string) *mongo.Database {
 	connectionString, errParse := connstring.ParseAndValidate(dbUri)
 	if errParse != nil {
-		fmt.Printf("Bad DB connection string: %v", dbUri)
-		os.Exit(1)
+		log.Fatalf("Bad DB connection string: %v", dbUri)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), DB_TIMEOUT)
@@ -29,8 +27,7 @@ func InitDB(dbUri string) *mongo.Database {
 
 	client, errMongo := mongo.Connect(ctx, options.Client().ApplyURI(dbUri))
 	if errMongo != nil {
-		fmt.Printf("Could not connect to DB: %v", dbUri)
-		os.Exit(1)
+		log.Fatalf("Could not connect to DB: %v", dbUri)
 	}
 
 	return client.Database(connectionString.Database)
@@ -41,6 +38,6 @@ func CloseDB(ctx context.Context, db *mongo.Database) {
 	defer cancel()
 
 	if err := db.Client().Disconnect(ctx); err != nil {
-		fmt.Printf("Error while closing DB connection. Error: %+v", err)
+		log.Printf("Error while closing DB connection. Error: %+v", err)
 	}
 }

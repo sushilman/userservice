@@ -59,7 +59,6 @@ $ go test ./...
 - Also skipped designing the OpenAPI/Swagger documentation
 - Password field is hashed before storing (during creation and updating)
 - Password is not included in the response to GET requests
-- Application loggings are done using `fmt.Printf()`, it is better to use a proper loggers like zerolog
 
 ## Possible Extension/Improvements
 ### Basic Improvements
@@ -67,7 +66,7 @@ $ go test ./...
     - Payload field validations
     - Verfication if a user already exists - eg: a user with duplicate email should not be allowed
  - If there are 3rd party external services that should be notified, then notifying them via webhook would be sensible. For that, we would also need a subscription management system, where the interested parties/clients can subscribe to the events that we expose. In the subscription, the subscriber should provide their REST API uri (along with credentials) that should be invoked when an event occurs.
- - Make use of a proper logger framework like - zerolog
+ - Make use of a better logger framework like - zerolog
  - Page numbering system can be improved (using cursor instead of pagesize and number)
 
 ### Production Deployment

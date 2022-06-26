@@ -4,6 +4,7 @@ package apiuser
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/go-playground/validator"
@@ -23,27 +24,27 @@ func PostUserHandler(userService services.IUserService) func(c *gin.Context) {
 		var userCreation models.UserCreation
 		errBindJSON := c.BindJSON(&userCreation)
 		if errBindJSON != nil {
-			fmt.Printf("Error when binding request body. Error: %+v", errBindJSON)
+			log.Printf("Error when binding request body. Error: %+v", errBindJSON)
 			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse("bad payload"))
 			return
 		}
 
 		invalidFields := validatePayload(userCreation)
 		if len(invalidFields) != 0 {
-			fmt.Println("Payload validation error. Invalid fields: ", invalidFields)
+			log.Println("Payload validation error. Invalid fields: ", invalidFields)
 			c.JSON(http.StatusBadRequest, usererrors.NewBadRequestErrorResponse(fmt.Sprint("Validation Error. Invalid fields: ", invalidFields)))
 			return
 		}
 
-		userId, err := userService.CreateUser(userCreation)
+		userId, err := userService.CreateUser(c, userCreation)
 		if err != nil {
-			fmt.Printf("Error when creating the user. Error: %+v", err)
+			log.Printf("Error when creating the user. Error: %+v", err)
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return
 		}
 
 		response := models.UserCreationResponse{
-			Link: BASE_PATH + "/" + userId,
+			Link: BASE_PATH + "/" + *userId,
 		}
 
 		c.JSON(http.StatusCreated, response)
@@ -57,7 +58,7 @@ func validatePayload(userCreation models.UserCreation) []string {
 	invalidFieldTags := make([]string, 0)
 	if errValidate != nil {
 		if _, ok := errValidate.(*validator.InvalidValidationError); ok {
-			fmt.Printf("Error while validating, Error %+v", errValidate)
+			log.Printf("Error while validating, Error %+v", errValidate)
 			return nil
 		}
 

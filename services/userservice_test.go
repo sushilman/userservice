@@ -1,6 +1,7 @@
 package services_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -49,7 +50,7 @@ func TestCreateUser(t *testing.T) {
 	)).Return(nil)
 
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
-	userId, err := userservice.CreateUser(userCreation)
+	userId, err := userservice.CreateUser(context.Background(), userCreation)
 
 	mockUserStorage.AssertNumberOfCalls(t, "Insert", 1)
 	mockMessageBroker.AssertNumberOfCalls(t, "Publish", 1)
@@ -69,7 +70,7 @@ func TestCreateUserExpectEmptyUserIdWhenInsertFails(t *testing.T) {
 	mockMessageBroker.On("Publish", mock.Anything, mock.Anything).Return(nil)
 
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
-	userId, err := userservice.CreateUser(userCreation)
+	userId, err := userservice.CreateUser(context.Background(), userCreation)
 
 	mockUserStorage.AssertNumberOfCalls(t, "Insert", 1)
 	mockMessageBroker.AssertNumberOfCalls(t, "Publish", 0) // Expect that it will NOT be called
@@ -89,7 +90,7 @@ func TestGetUsers(t *testing.T) {
 	mockMessageBroker := new(mocks.MockMessageBroker)
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
 
-	actualUsers, err := userservice.GetUsers(queryParams)
+	actualUsers, err := userservice.GetUsers(context.Background(), queryParams)
 
 	mockUserStorage.AssertNumberOfCalls(t, "GetAll", 1)
 	require.Nil(t, err)
@@ -106,7 +107,7 @@ func TestGetUsersExpectNilWhenFetchingFails(t *testing.T) {
 	mockMessageBroker := new(mocks.MockMessageBroker)
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
 
-	actualUsers, err := userservice.GetUsers(queryParams)
+	actualUsers, err := userservice.GetUsers(context.Background(), queryParams)
 
 	mockUserStorage.AssertNumberOfCalls(t, "GetAll", 1)
 	require.NotNil(t, err)
@@ -124,7 +125,7 @@ func TestGetUserById(t *testing.T) {
 	mockMessageBroker := new(mocks.MockMessageBroker)
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
 
-	actualUser, err := userservice.GetUserById(userId)
+	actualUser, err := userservice.GetUserById(context.Background(), userId)
 
 	mockUserStorage.AssertNumberOfCalls(t, "GetById", 1)
 	require.Nil(t, err)
@@ -141,7 +142,7 @@ func TestGetUserByIdWhenNonExistingUserId(t *testing.T) {
 	mockMessageBroker := new(mocks.MockMessageBroker)
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
 
-	actualUser, err := userservice.GetUserById(userId)
+	actualUser, err := userservice.GetUserById(context.Background(), userId)
 
 	mockUserStorage.AssertNumberOfCalls(t, "GetById", 1)
 	require.Nil(t, err)
@@ -158,7 +159,7 @@ func TestGetUserByIdWhenFetchingFails(t *testing.T) {
 	mockMessageBroker := new(mocks.MockMessageBroker)
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
 
-	actualUser, err := userservice.GetUserById(userId)
+	actualUser, err := userservice.GetUserById(context.Background(), userId)
 
 	mockUserStorage.AssertNumberOfCalls(t, "GetById", 1)
 	require.NotNil(t, err)
@@ -200,7 +201,7 @@ func TestUpdateUser(t *testing.T) {
 	)).Return(nil)
 
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
-	err := userservice.UpdateUser(userId, userToUpdate)
+	err := userservice.UpdateUser(context.Background(), userId, userToUpdate)
 
 	mockUserStorage.AssertNumberOfCalls(t, "Update", 1)
 	mockMessageBroker.AssertNumberOfCalls(t, "Publish", 1)
@@ -220,7 +221,7 @@ func TestUpdateUserWhenUpdateFails(t *testing.T) {
 	mockMessageBroker.On("Publish", mock.Anything, mock.Anything).Return(nil)
 
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
-	err := userservice.UpdateUser(userId, userToUpdate)
+	err := userservice.UpdateUser(context.Background(), userId, userToUpdate)
 
 	mockUserStorage.AssertNumberOfCalls(t, "Update", 1)
 	mockMessageBroker.AssertNumberOfCalls(t, "Publish", 0) // Expect that it will NOT be called
@@ -241,7 +242,7 @@ func TestDeleteUser(t *testing.T) {
 
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
 
-	err := userservice.DeleteUserById(userId)
+	err := userservice.DeleteUserById(context.Background(), userId)
 
 	mockUserStorage.AssertNumberOfCalls(t, "DeleteById", 1)
 	mockMessageBroker.AssertNumberOfCalls(t, "Publish", 1)
@@ -260,7 +261,7 @@ func TestDeleteUserWhenDeleteFails(t *testing.T) {
 
 	userservice := services.NewUserService(mockUserStorage, mockMessageBroker)
 
-	err := userservice.DeleteUserById(userId)
+	err := userservice.DeleteUserById(context.Background(), userId)
 
 	mockUserStorage.AssertNumberOfCalls(t, "DeleteById", 1)
 	mockMessageBroker.AssertNumberOfCalls(t, "Publish", 0)

@@ -3,7 +3,7 @@
 package messagebroker
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/goccy/go-json"
 )
@@ -21,6 +21,6 @@ func InitMessageBroker() MessageBroker {
 
 func (mb MessageBroker) Publish(topic string, message interface{}) error {
 	msg, _ := json.Marshal(message)
-	fmt.Printf("Publishing message to: \nTopic: %s \nMessage: %s", topic, string(msg))
+	log.Printf("Publishing message to: \nTopic: %s \nMessage: %s", topic, string(msg))
 	return nil
 }

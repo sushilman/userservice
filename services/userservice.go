@@ -2,7 +2,8 @@
 package services
 
 import (
-	"fmt"
+	"context"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,11 +15,11 @@ import (
 )
 
 type IUserService interface {
-	CreateUser(models.UserCreation) (string, error)
-	DeleteUserById(string) error
-	GetUsers(models.GetUserQueryParams) ([]models.User, error)
-	GetUserById(string) (*models.User, error)
-	UpdateUser(string, models.UserCreation) error
+	CreateUser(context.Context, models.UserCreation) (*string, error)
+	DeleteUserById(context.Context, string) error
+	GetUsers(context.Context, models.GetUserQueryParams) ([]models.User, error)
+	GetUserById(context.Context, string) (*models.User, error)
+	UpdateUser(context.Context, string, models.UserCreation) error
 }
 
 type UserService struct {
@@ -33,14 +34,14 @@ func NewUserService(storage db.IUserStorage, broker messagebroker.IMessageBroker
 	}
 }
 
-// returns the newly created userID
-func (us *UserService) CreateUser(userCreation models.UserCreation) (string, error) {
+// CreateUser returns the ID of the newly created user
+func (us *UserService) CreateUser(ctx context.Context, userCreation models.UserCreation) (*string, error) {
 	newUserId := uuid.NewString()
 	createdAt := time.Now().UTC().Format(time.RFC3339)
 	hashedPassword, errHash := utils.HashPassword(userCreation.Password)
 	if errHash != nil {
-		fmt.Printf("Error while hashing password. Error: %+v", errHash)
-		return "", errHash
+		log.Printf("Error while hashing password. Error: %+v", errHash)
+		return nil, errHash
 	}
 
 	user := models.User{
@@ -55,37 +56,40 @@ func (us *UserService) CreateUser(userCreation models.UserCreation) (string, err
 		UpdatedAt: createdAt,
 	}
 
-	err := us.storage.Insert(user)
+	err := us.storage.Insert(ctx, user)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	us.broker.Publish(events.USER_CREATED_TOPIC, events.UserCreatedEvent(user))
 
-	return newUserId, nil
+	return &newUserId, nil
 }
 
-func (us *UserService) GetUsers(queryParams models.GetUserQueryParams) ([]models.User, error) {
-	users, err := us.storage.GetAll(queryParams)
+// GetUsers returns the list of the Users, filtered by parameters in the queryParams
+func (us *UserService) GetUsers(ctx context.Context, queryParams models.GetUserQueryParams) ([]models.User, error) {
+	users, err := us.storage.GetAll(ctx, queryParams)
 	if err != nil {
 		return nil, err
 	}
 	return users, nil
 }
 
-func (us *UserService) GetUserById(userId string) (*models.User, error) {
-	user, err := us.storage.GetById(userId)
+// GetUserById returns the user having the provided userId
+func (us *UserService) GetUserById(ctx context.Context, userId string) (*models.User, error) {
+	user, err := us.storage.GetById(ctx, userId)
 	if err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (us *UserService) UpdateUser(userId string, userCreation models.UserCreation) error {
+// UpdateUser updates the user having the provided userId
+func (us *UserService) UpdateUser(ctx context.Context, userId string, userCreation models.UserCreation) error {
 	updatedAt := time.Now().UTC().Format(time.RFC3339)
 	hashedPassword, errHash := utils.HashPassword(userCreation.Password)
 	if errHash != nil {
-		fmt.Printf("Error while hashing password. Error: %+v", errHash)
+		log.Printf("Error while hashing password. Error: %+v", errHash)
 		return errHash
 	}
 
@@ -100,7 +104,7 @@ func (us *UserService) UpdateUser(userId string, userCreation models.UserCreatio
 		UpdatedAt: updatedAt,
 	}
 
-	err := us.storage.Update(user)
+	err := us.storage.Update(ctx, user)
 
 	if err != nil {
 		return err
@@ -111,8 +115,9 @@ func (us *UserService) UpdateUser(userId string, userCreation models.UserCreatio
 	return nil
 }
 
-func (us *UserService) DeleteUserById(userId string) error {
-	err := us.storage.DeleteById(userId)
+// DeleteUserById deletes the user having the provided userId
+func (us *UserService) DeleteUserById(ctx context.Context, userId string) error {
+	err := us.storage.DeleteById(ctx, userId)
 	if err != nil {
 		return err
 	}
