@@ -6,6 +6,9 @@ import (
 	pb "github.com/sushilman/userservice/grpc/proto"
 	"github.com/sushilman/userservice/models"
 	"github.com/sushilman/userservice/services"
+	"github.com/sushilman/userservice/usererrors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type UserServicegRPCServer struct {
@@ -17,7 +20,7 @@ func (s *UserServicegRPCServer) CreateUser(ctx context.Context, userCreation *pb
 	uc := mapUserCreation(userCreation)
 	id, err := s.US.CreateUser(uc)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "Something went wrong")
 	}
 
 	response := &pb.UserCreationResponse{Id: id}
@@ -29,7 +32,7 @@ func (s *UserServicegRPCServer) GetUsers(filterParams *pb.UserFilter, stream pb.
 	q := mapFilterParamQueryParams(filterParams)
 	users, err := s.US.GetUsers(q)
 	if err != nil {
-		return err
+		return status.Errorf(codes.Internal, "Something went wrong")
 	}
 
 	for _, user := range users {
@@ -44,8 +47,14 @@ func (s *UserServicegRPCServer) GetUsers(filterParams *pb.UserFilter, stream pb.
 func (s *UserServicegRPCServer) GetUserById(ctx context.Context, id *pb.UserId) (*pb.User, error) {
 	user, err := s.US.GetUserById(id.Id)
 	if err != nil {
-		return nil, err
+		switch err.(type) {
+		case *usererrors.NotFoundError:
+			return nil, status.Errorf(codes.NotFound, "User Not found")
+		}
+
+		return nil, status.Errorf(codes.Internal, "Something went wrong")
 	}
+
 	return mapUser(user), nil
 }
 
@@ -53,7 +62,7 @@ func (s *UserServicegRPCServer) UpdateUser(ctx context.Context, userUpdate *pb.U
 	uc := mapUserUpdate(userUpdate)
 	err := s.US.UpdateUser(userUpdate.Id, uc)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "Something went wrong")
 	}
 
 	return &pb.Empty{}, nil
@@ -62,7 +71,7 @@ func (s *UserServicegRPCServer) UpdateUser(ctx context.Context, userUpdate *pb.U
 func (s *UserServicegRPCServer) DeleteUser(ctx context.Context, id *pb.UserId) (*pb.Empty, error) {
 	err := s.US.DeleteUserById(id.Id)
 	if err != nil {
-		return nil, err
+		return nil, status.Errorf(codes.Internal, "Something went wrong")
 	}
 
 	return &pb.Empty{}, nil
