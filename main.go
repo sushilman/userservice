@@ -16,10 +16,12 @@ import (
 	"github.com/sushilman/userservice/api/apiuser"
 	"github.com/sushilman/userservice/db"
 	pb "github.com/sushilman/userservice/grpc/proto"
-	userservice "github.com/sushilman/userservice/grpc/server"
+	"github.com/sushilman/userservice/grpc/server/healthcheck"
+	grpcUserservice "github.com/sushilman/userservice/grpc/server/userservice"
 	"github.com/sushilman/userservice/messagebroker"
 	"github.com/sushilman/userservice/services"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 const (
@@ -74,7 +76,11 @@ func main() {
 	}
 
 	pb.RegisterUserServiceServer(grpcServer, newgRPCUserServer(userservice))
-	grpcServer.Serve(listen)
+	grpc_health_v1.RegisterHealthServer(grpcServer, healthcheck.NewHealthCheck())
+	grpcErr := grpcServer.Serve(listen)
+	if grpcErr != nil {
+		log.Fatalf("Cannot start the gRPC server")
+	}
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -85,8 +91,8 @@ func main() {
 	db.CloseDB(ctx, database)
 }
 
-func newgRPCUserServer(svc services.IUserService) *userservice.UserServicegRPCServer {
-	return &userservice.UserServicegRPCServer{
+func newgRPCUserServer(svc services.IUserService) *grpcUserservice.UserServicegRPCServer {
+	return &grpcUserservice.UserServicegRPCServer{
 		US: svc,
 	}
 }

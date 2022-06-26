@@ -15,8 +15,10 @@ $ docker run -d -p 27017:27017 mongo:latest
 $ go mod download
 $ DB_URI=mongodb://localhost:27017/users go run main.go
 ```
+## Available gRPC methods
 
-## Avilable endpoints
+
+## Available endpoints REST API
  - GET /healthz – a health check endpoint
  - POST /v1/users – create a new user
  - GET /v1/users – get all users (with filters, the filter parameters are case-sensitive)
