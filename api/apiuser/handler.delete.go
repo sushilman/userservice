@@ -13,7 +13,7 @@ import (
 func DeleteUserByIdHandler(userService services.IUserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
 
-		err := userService.DeleteUserById(c.Param("userId"))
+		err := userService.DeleteUserById(c, c.Param("userId"))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
 			return

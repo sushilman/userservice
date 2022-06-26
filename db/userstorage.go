@@ -21,11 +21,11 @@ const (
 
 // DB CRUD opertions for the 'users' collection
 type IUserStorage interface {
-	Insert(models.User) error
-	GetAll(models.GetUserQueryParams) ([]models.User, error)
-	GetById(string) (*models.User, error)
-	Update(models.User) error
-	DeleteById(string) error
+	Insert(context.Context, models.User) error
+	GetAll(context.Context, models.GetUserQueryParams) ([]models.User, error)
+	GetById(context.Context, string) (*models.User, error)
+	Update(context.Context, models.User) error
+	DeleteById(context.Context, string) error
 }
 
 // implements the IUserStorage interface
@@ -39,8 +39,8 @@ func NewStorage(database *mongo.Database) IUserStorage {
 	}
 }
 
-func (s *userstorage) Insert(user models.User) error {
-	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
+func (s *userstorage) Insert(ctx context.Context, user models.User) error {
+	ctx, cancel := context.WithTimeout(ctx, QUERY_TIMEOUT)
 	defer cancel()
 
 	_, err := s.database.Collection(COLLECTION).InsertOne(ctx, user)
@@ -48,8 +48,8 @@ func (s *userstorage) Insert(user models.User) error {
 	return err // 'nil' if successful
 }
 
-func (s *userstorage) GetAll(queryParams models.GetUserQueryParams) (users []models.User, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
+func (s *userstorage) GetAll(ctx context.Context, queryParams models.GetUserQueryParams) (users []models.User, err error) {
+	ctx, cancel := context.WithTimeout(ctx, QUERY_TIMEOUT)
 	defer cancel()
 
 	filter := bson.M{}
@@ -87,8 +87,8 @@ func (s *userstorage) GetAll(queryParams models.GetUserQueryParams) (users []mod
 	return users, nil
 }
 
-func (s *userstorage) GetById(id string) (*models.User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
+func (s *userstorage) GetById(ctx context.Context, id string) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(ctx, QUERY_TIMEOUT)
 	defer cancel()
 
 	user := models.User{}
@@ -102,8 +102,8 @@ func (s *userstorage) GetById(id string) (*models.User, error) {
 	return &user, err
 }
 
-func (s *userstorage) Update(user models.User) error {
-	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
+func (s *userstorage) Update(ctx context.Context, user models.User) error {
+	ctx, cancel := context.WithTimeout(ctx, QUERY_TIMEOUT)
 	defer cancel()
 
 	filter := bson.M{"id": user.Id}
@@ -123,8 +123,8 @@ func (s *userstorage) Update(user models.User) error {
 	return nil
 }
 
-func (s *userstorage) DeleteById(id string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), QUERY_TIMEOUT)
+func (s *userstorage) DeleteById(ctx context.Context, id string) error {
+	ctx, cancel := context.WithTimeout(ctx, QUERY_TIMEOUT)
 	defer cancel()
 
 	query := bson.M{"id": id}

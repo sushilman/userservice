@@ -30,7 +30,7 @@ func UpdateUserHandler(userService services.IUserService) func(c *gin.Context) {
 			return
 		}
 
-		err := userService.UpdateUser(c.Param("userId"), userCreation)
+		err := userService.UpdateUser(c, c.Param("userId"), userCreation)
 		if err != nil {
 			switch err.(type) {
 			case *usererrors.NotFoundError:

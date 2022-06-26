@@ -33,7 +33,7 @@ func GetUsersHandler(userService services.IUserService) func(c *gin.Context) {
 			return
 		}
 
-		users, err := userService.GetUsers(queryParams)
+		users, err := userService.GetUsers(c, queryParams)
 		if err != nil {
 			log.Printf("Error while fetching users.\nError: %+v", err)
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
@@ -74,7 +74,7 @@ func GetUsersHandler(userService services.IUserService) func(c *gin.Context) {
 
 func GetUserByIdHandler(userService services.IUserService) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		user, err := userService.GetUserById(c.Param("userId"))
+		user, err := userService.GetUserById(c, c.Param("userId"))
 		if err != nil {
 			switch err.(type) {
 			case *usererrors.NotFoundError:

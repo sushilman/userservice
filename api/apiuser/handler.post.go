@@ -36,7 +36,7 @@ func PostUserHandler(userService services.IUserService) func(c *gin.Context) {
 			return
 		}
 
-		userId, err := userService.CreateUser(userCreation)
+		userId, err := userService.CreateUser(c, userCreation)
 		if err != nil {
 			log.Printf("Error when creating the user. Error: %+v", err)
 			c.JSON(http.StatusInternalServerError, usererrors.NewInternalServerError("Something went wrong"))
