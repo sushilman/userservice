@@ -7,8 +7,8 @@ service UserService {
   rpc CreateUser(UserCreation) returns (UserCreationResponse) {}
   rpc GetUsers(UserFilter) returns (stream User) {}
   rpc GetUserById(UserId) returns (User) {}
-  rpc UpdateUser(UserId) returns (UpdateUserResponse) {}
-  rpc DeleteUser(UserId) returns (DeleteUserResponse) {}
+  rpc UpdateUser(UserUpdate) returns (Empty) {}
+  rpc DeleteUser(UserId) returns (Empty) {}
 }
 
 message User {
@@ -36,17 +36,21 @@ message UserCreation {
 	string country = 6;
 }
 
+message UserUpdate {
+  string id = 1;
+  string first_name = 2;
+	string last_name = 3;
+	string nickname = 4;
+	string password = 5;
+	string email = 6;
+	string country = 7;
+}
+
 message UserCreationResponse {
-  string link = 1;
+  string id = 1;
 }
 
-message UpdateUserResponse {
-  bool updated = 1;
-}
-
-message DeleteUserResponse {
-  bool deleted = 1;
-}
+message Empty {}
 
 message UserFilter {
   string first_name = 1;

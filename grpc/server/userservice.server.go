@@ -14,7 +14,15 @@ type UserServicegRPCServer struct {
 }
 
 func (s *UserServicegRPCServer) CreateUser(ctx context.Context, userCreation *pb.UserCreation) (*pb.UserCreationResponse, error) {
-	return nil, nil
+	uc := mapUserCreation(userCreation)
+	id, err := s.US.CreateUser(uc)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &pb.UserCreationResponse{Id: id}
+
+	return response, nil
 }
 
 func (s *UserServicegRPCServer) GetUsers(filterParams *pb.UserFilter, stream pb.UserService_GetUsersServer) error {
@@ -41,9 +49,46 @@ func (s *UserServicegRPCServer) GetUserById(ctx context.Context, id *pb.UserId) 
 	return mapUser(user), nil
 }
 
-func UpdateUser(ctx context.Context, id *pb.UserId) (*pb.UpdateUserResponse, error) { return nil, nil }
+func (s *UserServicegRPCServer) UpdateUser(ctx context.Context, userUpdate *pb.UserUpdate) (*pb.Empty, error) {
+	uc := mapUserUpdate(userUpdate)
+	err := s.US.UpdateUser(userUpdate.Id, uc)
+	if err != nil {
+		return nil, err
+	}
 
-func DeleteUser(ctx context.Context, id *pb.UserId) (*pb.DeleteUserResponse, error) { return nil, nil }
+	return &pb.Empty{}, nil
+}
+
+func (s *UserServicegRPCServer) DeleteUser(ctx context.Context, id *pb.UserId) (*pb.Empty, error) {
+	err := s.US.DeleteUserById(id.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.Empty{}, nil
+}
+
+func mapUserCreation(u *pb.UserCreation) models.UserCreation {
+	return models.UserCreation{
+		FirstName: u.FirstName,
+		LastName:  u.LastName,
+		Nickname:  u.Nickname,
+		Password:  u.Password,
+		Email:     u.Email,
+		Country:   u.Country,
+	}
+}
+
+func mapUserUpdate(u *pb.UserUpdate) models.UserCreation {
+	return models.UserCreation{
+		FirstName: u.FirstName,
+		LastName:  u.LastName,
+		Nickname:  u.Nickname,
+		Password:  u.Password,
+		Email:     u.Email,
+		Country:   u.Country,
+	}
+}
 
 func mapUser(u *models.User) *pb.User {
 	return &pb.User{

@@ -25,8 +25,8 @@ type UserServiceClient interface {
 	CreateUser(ctx context.Context, in *UserCreation, opts ...grpc.CallOption) (*UserCreationResponse, error)
 	GetUsers(ctx context.Context, in *UserFilter, opts ...grpc.CallOption) (UserService_GetUsersClient, error)
 	GetUserById(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*User, error)
-	UpdateUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*UpdateUserResponse, error)
-	DeleteUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*DeleteUserResponse, error)
+	UpdateUser(ctx context.Context, in *UserUpdate, opts ...grpc.CallOption) (*Empty, error)
+	DeleteUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type userServiceClient struct {
@@ -87,8 +87,8 @@ func (c *userServiceClient) GetUserById(ctx context.Context, in *UserId, opts ..
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
-	out := new(UpdateUserResponse)
+func (c *userServiceClient) UpdateUser(ctx context.Context, in *UserUpdate, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/userservice.UserService/UpdateUser", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -96,8 +96,8 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *UserId, opts ...
 	return out, nil
 }
 
-func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*DeleteUserResponse, error) {
-	out := new(DeleteUserResponse)
+func (c *userServiceClient) DeleteUser(ctx context.Context, in *UserId, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/userservice.UserService/DeleteUser", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -112,8 +112,8 @@ type UserServiceServer interface {
 	CreateUser(context.Context, *UserCreation) (*UserCreationResponse, error)
 	GetUsers(*UserFilter, UserService_GetUsersServer) error
 	GetUserById(context.Context, *UserId) (*User, error)
-	UpdateUser(context.Context, *UserId) (*UpdateUserResponse, error)
-	DeleteUser(context.Context, *UserId) (*DeleteUserResponse, error)
+	UpdateUser(context.Context, *UserUpdate) (*Empty, error)
+	DeleteUser(context.Context, *UserId) (*Empty, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -130,10 +130,10 @@ func (UnimplementedUserServiceServer) GetUsers(*UserFilter, UserService_GetUsers
 func (UnimplementedUserServiceServer) GetUserById(context.Context, *UserId) (*User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserById not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UserId) (*UpdateUserResponse, error) {
+func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UserUpdate) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
 }
-func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserId) (*DeleteUserResponse, error) {
+func (UnimplementedUserServiceServer) DeleteUser(context.Context, *UserId) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteUser not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
@@ -207,7 +207,7 @@ func _UserService_GetUserById_Handler(srv interface{}, ctx context.Context, dec 
 }
 
 func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserId)
+	in := new(UserUpdate)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -219,7 +219,7 @@ func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: "/userservice.UserService/UpdateUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).UpdateUser(ctx, req.(*UserId))
+		return srv.(UserServiceServer).UpdateUser(ctx, req.(*UserUpdate))
 	}
 	return interceptor(ctx, in, info, handler)
 }

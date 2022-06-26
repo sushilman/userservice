@@ -33,6 +33,7 @@ func NewUserService(storage db.IUserStorage, broker messagebroker.IMessageBroker
 	}
 }
 
+// returns the newly created userID
 func (us *UserService) CreateUser(userCreation models.UserCreation) (string, error) {
 	newUserId := uuid.NewString()
 	createdAt := time.Now().UTC().Format(time.RFC3339)
