@@ -26,7 +26,8 @@ import (
 
 const (
 	SERVICE_NAME              = "User Service"
-	DEFAULT_PORT              = "8080"
+	DEFAULT_HTTP_PORT         = "8080"
+	DEFAULT_GRPC_PORT         = "50051"
 	GRACEFUL_SHUTDOWN_TIMEOUT = 25
 )
 
@@ -56,7 +57,7 @@ func main() {
 	apiuser.InitRoutes(router, userservice)
 
 	srv := &http.Server{
-		Addr:    ":" + DEFAULT_PORT,
+		Addr:    ":" + DEFAULT_HTTP_PORT,
 		Handler: router,
 	}
 
@@ -70,7 +71,7 @@ func main() {
 
 	// Start gRPC server
 	grpcServer := grpc.NewServer()
-	listen, err := net.Listen("tcp", "localhost:50051")
+	listen, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", DEFAULT_GRPC_PORT))
 	if err != nil {
 		fmt.Printf("Failed to listen")
 	}

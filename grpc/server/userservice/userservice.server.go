@@ -120,7 +120,6 @@ func mapUser(u *models.User) *pb.User {
 		FirstName: u.FirstName,
 		LastName:  u.LastName,
 		Nickname:  u.Nickname,
-		Password:  u.Password,
 		Email:     u.Email,
 		Country:   u.Country,
 		CreatedAt: u.CreatedAt,

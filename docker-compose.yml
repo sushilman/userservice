@@ -13,6 +13,7 @@ services:
     depends_on:
       - mongo
     ports:
-      - "8080:8080"
+      - "8080:8080" # http port
+      - "50051:50051" # grpc port
     environment:
       DB_URI: mongodb://mongo:27017/users

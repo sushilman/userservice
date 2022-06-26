@@ -1,5 +1,8 @@
 # FACEIT User Service
-Demo user service
+Demo user service.
+The service serves both REST API server and gRPC server.
+- HTTP API is served in the port `:8080`
+- gRPC is served in the port `50051`
 
 ## How to start the application
 The application can be launched in two different ways:
@@ -16,7 +19,12 @@ $ go mod download
 $ DB_URI=mongodb://localhost:27017/users go run main.go
 ```
 ## Available gRPC methods
-
+ - `Check()` and `Watch()` – for healthcheck according to the grpc google.golang.org/grpc/health/grpc_health_v1 healthcheck standard
+ - `CreateUser()` – create a new user
+ - `GetUsers()` - fetch all users, filterable
+ - `GetUserById()` – fetch a specific user by ID
+ - `UpdateUser()` – update a specific user (identified by ID)
+ - `DeleteUser()` – delete a specific user (identified by ID)
 
 ## Available endpoints REST API
  - GET /healthz – a health check endpoint
