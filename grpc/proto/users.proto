@@ -1,0 +1,59 @@
+syntax = "proto3";
+package userservice;
+
+option go_package = "github.com/sushilman/userservice";
+
+service UserService {
+  rpc CreateUser(UserCreation) returns (UserCreationResponse) {}
+  rpc GetUsers(UserFilter) returns (stream User) {}
+  rpc GetUserById(UserId) returns (User) {}
+  rpc UpdateUser(UserId) returns (UpdateUserResponse) {}
+  rpc DeleteUser(UserId) returns (DeleteUserResponse) {}
+}
+
+message User {
+  string id = 1;
+  string first_name = 2;
+	string last_name = 3;
+	string nickname = 4;
+	string password = 5;
+	string email = 6;
+	string country = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message UserId {
+  string id = 1;
+}
+
+message UserCreation {
+  string first_name = 1;
+	string last_name = 2;
+	string nickname = 3;
+	string password = 4;
+	string email = 5;
+	string country = 6;
+}
+
+message UserCreationResponse {
+  string link = 1;
+}
+
+message UpdateUserResponse {
+  bool updated = 1;
+}
+
+message DeleteUserResponse {
+  bool deleted = 1;
+}
+
+message UserFilter {
+  string first_name = 1;
+  string last_name = 2;
+	string nickname = 3;
+  string email = 4;
+  string country = 5;
+  int32 offset = 6;
+  int32 limit = 7;
+}

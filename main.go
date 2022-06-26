@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,8 +14,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sushilman/userservice/api/apiuser"
 	"github.com/sushilman/userservice/db"
+	pb "github.com/sushilman/userservice/grpc/proto"
+	userservice "github.com/sushilman/userservice/grpc/server"
 	"github.com/sushilman/userservice/messagebroker"
 	"github.com/sushilman/userservice/services"
+	"google.golang.org/grpc"
 )
 
 const (
@@ -53,6 +57,7 @@ func main() {
 		Handler: router,
 	}
 
+	// Start http server
 	go func() {
 		err := srv.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -61,6 +66,16 @@ func main() {
 		}
 	}()
 
+	// Start gRPC server
+	grpcServer := grpc.NewServer()
+	listen, err := net.Listen("tcp", "localhost:50051")
+	if err != nil {
+		fmt.Printf("Failed to listen")
+	}
+
+	pb.RegisterUserServiceServer(grpcServer, newgRPCUserServer(userservice))
+	grpcServer.Serve(listen)
+
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
@@ -68,4 +83,10 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(GRACEFUL_SHUTDOWN_TIMEOUT)*time.Second)
 	defer cancel()
 	db.CloseDB(ctx, database)
+}
+
+func newgRPCUserServer(svc services.IUserService) *userservice.UserServicegRPCServer {
+	return &userservice.UserServicegRPCServer{
+		US: svc,
+	}
 }

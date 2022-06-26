@@ -14,10 +14,10 @@ type UserCreation struct {
 // also reused as the DB model (to keep things simple)
 type User struct {
 	Id        string `json:"id" bson:"id"`
-	Password  string `json:"-" bson:"password"`
 	FirstName string `json:"first_name" bson:"first_name"`
 	LastName  string `json:"last_name" bson:"last_name"`
 	Nickname  string `json:"nickname" bson:"nickname"`
+	Password  string `json:"-" bson:"password"`
 	Email     string `json:"email" bson:"email"`
 	Country   string `json:"country" bson:"country"`
 	CreatedAt string `json:"created_at" bson:"created_at,omitempty"`
@@ -41,11 +41,11 @@ type PaginationLinks struct {
 }
 
 type GetUserQueryParams struct {
-	Country   string `form:"country"`
 	FirstName string `form:"first_name"`
 	LastName  string `form:"last_name"`
 	NickName  string `form:"nickname"`
 	Email     string `form:"email"`
+	Country   string `form:"country"`
 	Offset    uint   `form:"offset"`
 	Limit     uint   `form:"limit"`
 }
