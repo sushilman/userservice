@@ -2,7 +2,7 @@
 package services
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,7 +14,7 @@ import (
 )
 
 type IUserService interface {
-	CreateUser(models.UserCreation) (string, error)
+	CreateUser(models.UserCreation) (*string, error)
 	DeleteUserById(string) error
 	GetUsers(models.GetUserQueryParams) ([]models.User, error)
 	GetUserById(string) (*models.User, error)
@@ -33,13 +33,13 @@ func NewUserService(storage db.IUserStorage, broker messagebroker.IMessageBroker
 	}
 }
 
-func (us *UserService) CreateUser(userCreation models.UserCreation) (string, error) {
+func (us *UserService) CreateUser(userCreation models.UserCreation) (*string, error) {
 	newUserId := uuid.NewString()
 	createdAt := time.Now().UTC().Format(time.RFC3339)
 	hashedPassword, errHash := utils.HashPassword(userCreation.Password)
 	if errHash != nil {
-		fmt.Printf("Error while hashing password. Error: %+v", errHash)
-		return "", errHash
+		log.Printf("Error while hashing password. Error: %+v", errHash)
+		return nil, errHash
 	}
 
 	user := models.User{
@@ -56,12 +56,12 @@ func (us *UserService) CreateUser(userCreation models.UserCreation) (string, err
 
 	err := us.storage.Insert(user)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	us.broker.Publish(events.USER_CREATED_TOPIC, events.UserCreatedEvent(user))
 
-	return newUserId, nil
+	return &newUserId, nil
 }
 
 func (us *UserService) GetUsers(queryParams models.GetUserQueryParams) ([]models.User, error) {
@@ -84,7 +84,7 @@ func (us *UserService) UpdateUser(userId string, userCreation models.UserCreatio
 	updatedAt := time.Now().UTC().Format(time.RFC3339)
 	hashedPassword, errHash := utils.HashPassword(userCreation.Password)
 	if errHash != nil {
-		fmt.Printf("Error while hashing password. Error: %+v", errHash)
+		log.Printf("Error while hashing password. Error: %+v", errHash)
 		return errHash
 	}
 

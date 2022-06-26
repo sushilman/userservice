@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -56,8 +56,7 @@ func main() {
 	go func() {
 		err := srv.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			fmt.Printf("Unable to start the server")
-			os.Exit(1)
+			log.Fatal("Unable to start the server")
 		}
 	}()
 
