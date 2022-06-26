@@ -98,6 +98,7 @@ $ go test ./...
  - *apiusers* – the API layer
  - *db* – the Storage(Database) layer
  - *events* – simply holds the event structs for any changes on user entity (create, update, delete)
+ - *grpc* – the gRPC layer
  - *messagebroker* – a dummy message broker
  - *mocks* – for unit/mock tests 
  - *services* – service layer implementations
