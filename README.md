@@ -1,4 +1,4 @@
-# FACEIT User Service
+# User Service
 Demo user service.
 The service serves both REST API server and gRPC server.
 - HTTP API is served in the port `:8080`
